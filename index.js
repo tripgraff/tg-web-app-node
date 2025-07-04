@@ -17,7 +17,7 @@ bot.on('message', async(msg) => {
   const text = msg.text;
 
     if(text === '/start') {
-        await bot.sendMessage(chatId, 'Ниже появится кнопка, заполни форму', {
+        await bot.sendMessage(chatId, 'Ниже появится кнопка, заполни форму йоу', {
             reply_markup: {
                 keyboard: [
                     [{text: 'Заполнить форму', web_app: {url: webAppUrl + '/form'}}]
