@@ -17,7 +17,7 @@ bot.on('message', async(msg) => {
   const text = msg.text;
 
     if(text === '/start') {
-        await bot.sendMessage(chatId, 'Ниже появится кнопка, заполни форму йоу', {
+        await bot.sendMessage(chatId, 'Ниже появится кнопка, заполни форму', {
             reply_markup: {
                 keyboard: [
                     [{text: 'Заполнить форму', web_app: {url: webAppUrl + '/form'}}]
@@ -51,25 +51,22 @@ bot.on('message', async(msg) => {
 });
 
 app.post('/web-data', async (req, res) => {
-  const {qureId, products, totalPrice} = req.body;
-  try {
-    await bot.answerWebAppQuery(qureId, {
-      type: 'article',
-      id: qureId,
-      title: 'Успешная покупка',
-      input_message_content: {message_text: 'Поздравляю с покупкой. Сумма покупки: ' + totalPrice}
-    })
-    return res.status(200).json({})
-  } catch (e) {
-    await bot.answerWebAppQuery(qureId, {
-      type: 'article',
-      id: qureId,
-      title: 'Не удалось приобрести товар',
-      input_message_content: {message_text: 'Не удалось приобрести товар'}
-    })
-    return res.status(500).json({})
-  }
+    const {queryId, products = [], totalPrice} = req.body;
+    try {
+        await bot.answerWebAppQuery(queryId, {
+            type: 'article',
+            id: queryId,
+            title: 'Успешная покупка',
+            input_message_content: {
+                message_text: ` Поздравляю с покупкой, вы приобрели товар на сумму ${totalPrice}, ${products.map(item => item.title).join(', ')}`
+            }
+        })
+        return res.status(200).json({});
+    } catch (e) {
+        return res.status(500).json({})
+    }
 })
 
 const PORT = 8000;
-app.listen(PORT, () => console.log('server start on PORT ' + PORT))
+
+app.listen(PORT, () => console.log('server started on PORT ' + PORT))
