@@ -1,6 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
-const express = require('express')
-const cors = require('cors')
+const express = require('express');
+const cors = require('cors');
 
 const token = '7803264095:AAHGq6nz8KhsdB5AZxXyY7WRKiHdZkovTRA';
 
@@ -51,21 +51,28 @@ bot.on('message', async(msg) => {
 });
 
 app.post('/web-data', async (req, res) => {
-    const {queryId, products = [], totalPrice} = req.body;
+    console.log('Received request:', req.method, req.body);
+    if (!req.body) {
+        console.error('Request body is undefined');
+        return res.status(400).json({ error: 'Request body is missing' });
+    }
+    const { queryId, products = [], totalPrice } = req.body;
     try {
         await bot.answerWebAppQuery(queryId, {
             type: 'article',
             id: queryId,
             title: 'Успешная покупка',
             input_message_content: {
-                message_text: ` Поздравляю с покупкой, вы приобрели товар на сумму ${totalPrice}, ${products.map(item => item.title).join(', ')}`
+                message_text: `Поздравляю с покупкой, вы приобрели товар на сумму ${totalPrice}, ${products.map(item => item.title).join(', ')}`
             }
-        })
+        });
+        console.log('WebAppQuery answered successfully');
         return res.status(200).json({});
     } catch (e) {
-        return res.status(500).json({})
+        console.error('Error in /web-data:', e);
+        return res.status(500).json({});
     }
-})
+});
 
 const PORT = 8000;
 
