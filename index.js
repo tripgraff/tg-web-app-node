@@ -10,15 +10,11 @@ const bot = new TelegramBot(token, {polling: true});
 const app = express();
 
 app.use(express.json());
-app.use(cors({
-    origin: 'https://tripgraff.netlify.app',
-    methods: ['POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type'],
-}));
+app.use(cors());
 
-bot.on('message', async(msg) => {
-  const chatId = msg.chat.id;
-  const text = msg.text;
+bot.on('message', async (msg) => {
+    const chatId = msg.chat.id;
+    const text = msg.text;
 
     if(text === '/start') {
         await bot.sendMessage(chatId, 'Ниже появится кнопка, заполни форму', {
@@ -29,29 +25,30 @@ bot.on('message', async(msg) => {
             }
         })
 
-        await bot.sendMessage(chatId, 'Ниже появится кнопка', {
+        await bot.sendMessage(chatId, 'Заходи в наш интернет магазин по кнопке ниже', {
             reply_markup: {
                 inline_keyboard: [
-                    [{text: 'Открыть приложение', web_app: {url: webAppUrl}}]
+                    [{text: 'Сделать заказ', web_app: {url: webAppUrl}}]
                 ]
             }
         })
     }
 
-  if(msg?.web_app_data?.data) {
-    try {
-      const data = JSON. parse(msg?.web_app_data?.data)
-      await bot.sendMessage(chatId, 'Спасибо за обратную связь !')
-      await bot.sendMessage(chatId, 'Ваша страна:' + data?.country);
-      await bot.sendMessage(chatId, 'Ваша улица:' + data?.street);
+    if(msg?.web_app_data?.data) {
+        try {
+            const data = JSON.parse(msg?.web_app_data?.data)
+            console.log(data)
+            await bot.sendMessage(chatId, 'Спасибо за обратную связь!')
+            await bot.sendMessage(chatId, 'Ваша страна: ' + data?.country);
+            await bot.sendMessage(chatId, 'Ваша улица: ' + data?.street);
 
-      setTimeout(async () => {
-        await bot.sendMessage(chatId, 'Всю информацию вы получите в этом чате');
-      }, 3000)
-    } catch (e) {
-      console.log(e);
+            setTimeout(async () => {
+                await bot.sendMessage(chatId, 'Всю информацию вы получите в этом чате');
+            }, 3000)
+        } catch (e) {
+            console.log(e);
+        }
     }
-  }
 });
 
 app.post('/web-data', async (req, res) => {
